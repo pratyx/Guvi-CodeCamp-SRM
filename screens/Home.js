@@ -17,7 +17,6 @@ export default function Home(){
         .then(info =>{
             console.log(info.data.data[0])
         })
- //   } 
     
     return(
         <View>
