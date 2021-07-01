@@ -1,46 +1,67 @@
 import React,{useState,useEffect} from 'react';
-import { StyleSheet, View,TextInput,FlatList,Text,TouchableOpacity, Alert,Button,Platform,StatusBar } from 'react-native';
+import { StyleSheet, View,TextInput,FlatList,Text,TouchableOpacity, Alert,Button,Platform,StatusBar,PermissionsAndroid,AppState } from 'react-native';
 import { Card } from 'react-native-paper';
 import axios from 'axios';
 import Constants from 'expo-constants';
 import * as Location from 'expo-location';
+import {countries} from 'country-data'
 
 
 export default function Search({navigation}){
     const [city,setCity] = useState('');
     const [cities,setCities] = useState([]);
-    const [data,setdata] = useState({text:'city'});
 
     const [location, setLocation] = useState(null);
     const [errorMsg, setErrorMsg] = useState(null);
+    const days=['Sun','Mon','Tues','Wed','Thus','Fri','Sat','Sun','Mon','Tues','Wed','Thus','Fri','Sat']
+
+
+    handleAppStateChange = nextAppState => {
+      state={
+        appState:AppState.currentState
+      };
+      if (
+        this.state.appState.match(/inactive|background/) &&
+        nextAppState === 'active'
+      ) {
+        console.log('App has come to the foreground!');
+        this._getLocationAsync();
+      }
+      this.setState({ appState: nextAppState });
+    };
+  
   
     useEffect(() => {
-      (async () => {
-        if (Platform.OS === 'android' && !Constants.isDevice) {
-          setErrorMsg(
-            'Oops, this will not work on Snack in an Android emulator. Try it on your device!'
-          );
-          return;
-        }
-        let { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== 'granted') {
-          setErrorMsg('Permission to access location was denied');
-          return;
-        }
-  
-        let location = await Location.getCurrentPositionAsync({});
-        setLocation(location);
-      })();
-    }, []);
+        (async () => {
+          if (Platform.OS === 'android' && !Constants.isDevice) {
+            setErrorMsg(
+              'Oops, this will not work on Snack in an Android emulator. Try it on your device!'
+            );
+            return;
+          }
+          try{
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+              setErrorMsg('Permission to access location was denied');
+              return;
+            }
+      
+            let location = await Location.getCurrentPositionAsync({});
+            setLocation(location);
+    
+          }
+          catch{
+            Alert.alert('Alert!','You will need to open your location to get weather of your area',[
+              {text:'OK',onPress:()=> console.log('Error')}
+            ]);
+          }
+    
+        })();
+      }, []);
 
     const clickHandler= ()=> {
   
-        let text = 'Waiting..';
-        if (errorMsg) {
-          text = errorMsg;
-        } else if (location) {
-          text = JSON.stringify(location);
-          console.log(JSON.stringify(location));
+        if (location) {
           console.log(JSON.stringify(location.coords.latitude));
           console.log(JSON.stringify(location.coords.longitude));
           const latitude = JSON.stringify(location.coords.latitude);
@@ -49,10 +70,9 @@ export default function Search({navigation}){
           .then(info =>{
             const city = info.data.city_name;
           const check = info.data.timezone;
-          console.log(city);
+          const country=countries[info.data.country_code].name;
           axios.get("http://worldtimeapi.org/api/timezone/"+check+".json")
           .then(time=>{
-  
               var sunrisets=parseInt(info.data.data[0].sunrise_ts)-parseInt(info.data.data[0].ts);
               sunrisets = sunrisets-(5.5*60*60);
               var sunsetts=parseInt(info.data.data[0].sunset_ts)-parseInt(info.data.data[0].ts);
@@ -65,20 +85,61 @@ export default function Search({navigation}){
               const samay=time.data.datetime.slice(11,16);
               const max_temp=info.data.data[0].max_temp;
               const min_temp=info.data.data[0].min_temp;
+              const d1max_temp=info.data.data[1].max_temp;
+            const d1min_temp=info.data.data[1].min_temp;
+            const d2max_temp=info.data.data[2].max_temp;
+            const d2min_temp=info.data.data[2].min_temp;
+            const d3max_temp=info.data.data[3].max_temp;
+            const d3min_temp=info.data.data[3].min_temp;
+            const d4max_temp=info.data.data[4].max_temp;
+            const d4min_temp=info.data.data[4].min_temp;
              const wind=info.data.data[0].wind_spd;
              const pop=info.data.data[0].pop;
+             const pop1=info.data.data[1].pop;
+           const pop2=info.data.data[2].pop;
+           const pop3=info.data.data[3].pop;
+           const pop4=info.data.data[4].pop;
+           const cloud = info.data.data[0].clouds;
+           const cloud1 = info.data.data[1].clouds;
+           const cloud2 = info.data.data[2].clouds;
+           const cloud3 = info.data.data[3].clouds;
+           const cloud4 = info.data.data[4].clouds;
              const Sunrise=sr;
              const Sunset=ss;
-             
-             navigation.navigate('Weather',{city:city,country:'India',temprature:temprature,Time:samay,max:max_temp,min:min_temp,windspd:wind,rain:pop,sunrise:Sunrise,sunset:Sunset});
+             const date = parseInt(new Date().getDay());
+            const day1 = days[date+1];
+            const day2 = days[date+2];
+            const day3 = days[date+3];
+            const day4 = days[date+4];
+            setCity('');
+            setCities('');
+             navigation.navigate('Weather',{city:city,country:country,temprature:temprature,Time:samay,
+                max:max_temp,min:min_temp,windspd:wind,rain:pop,pop1:pop1,pop2:pop2,pop3:pop3,pop4:pop4,
+                cloud:cloud,cloud1:cloud1,cloud2:cloud2,cloud3:cloud3,cloud4:cloud4,
+                sunrise:Sunrise,sunset:Sunset,
+                d1max_temp:d1max_temp,d1min_temp:d1min_temp,d2max_temp:d2max_temp,d2min_temp:d2min_temp,
+                d3max_temp:d3max_temp,d3min_temp:d3min_temp,d4max_temp:d4max_temp,d4min_temp:d4min_temp,
+                day1:day1,day2:day2,day3:day3,day4:day4});
           })
           
-          
-  
           
           
       })
           
+        }
+        else{
+          const granted = PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+            {
+              title: "Alert!",
+              message:
+                "Please allow this app to use your Location", 
+              buttonNegative: "Cancel",
+              buttonPositive: "OK"
+            }
+          );
+          AppState.addEventListener('change',this.handleAppStateChange)
+
         }
         
       }
@@ -99,6 +160,7 @@ export default function Search({navigation}){
                 })
             .catch(error=>{
                 setCity('');
+                setCities('');
                 Alert.alert('OOPS!','Something Went Wrong',[
                     {text:'OK',onPress:()=> console.log('error')}
                 ])
@@ -129,6 +191,8 @@ export default function Search({navigation}){
             var sunrisets=parseInt(info.data.data[0].sunrise_ts)-parseInt(info.data.data[0].ts);
             sunrisets = sunrisets-(5.5*60*60);
             var sunsetts=parseInt(info.data.data[0].sunset_ts)-parseInt(info.data.data[0].ts);
+            const ts =new Date(parseInt(info.data.data[0].sunrise_ts)*1000);
+            console.log(ts); 
             sunsetts = sunsetts-(5.5*60*60);
             const dateobj1 = new Date(sunrisets*1000);
             const dateobj2 = new Date(sunsetts*1000);
@@ -138,26 +202,67 @@ export default function Search({navigation}){
             const samay=time.data.datetime.slice(11,16);
             const max_temp=info.data.data[0].max_temp;
             const min_temp=info.data.data[0].min_temp;
+            const d1max_temp=info.data.data[1].max_temp;
+            const d1min_temp=info.data.data[1].min_temp;
+            const d2max_temp=info.data.data[2].max_temp;
+            const d2min_temp=info.data.data[2].min_temp;
+            const d3max_temp=info.data.data[3].max_temp;
+            const d3min_temp=info.data.data[3].min_temp;
+            const d4max_temp=info.data.data[4].max_temp;
+            const d4min_temp=info.data.data[4].min_temp;
            const wind=info.data.data[0].wind_spd;
            const pop=info.data.data[0].pop;
+           const pop1=info.data.data[1].pop;
+           const pop2=info.data.data[2].pop;
+           const pop3=info.data.data[3].pop;
+           const pop4=info.data.data[4].pop;
+           const cloud = info.data.data[0].clouds;
+           const cloud1 = info.data.data[1].clouds;
+           const cloud2 = info.data.data[2].clouds;
+           const cloud3 = info.data.data[3].clouds;
+           const cloud4 = info.data.data[4].clouds;
            const Sunrise=sr;
            const Sunset=ss;
+           const date = parseInt(new Date().getDay());
+           const day1 = days[date+1];
+           const day2 = days[date+2];
+           const day3 = days[date+3];
+           const day4 = days[date+4];
            
-           navigation.navigate('Weather',{city:city,country:state,temprature:temprature,Time:samay,max:max_temp,min:min_temp,windspd:wind,rain:pop,sunrise:Sunrise,sunset:Sunset});
+           setCity('');
+           setCities('');
+           navigation.navigate('Weather',{city:city,country:state,temprature:temprature,Time:samay,
+            max:max_temp,min:min_temp,windspd:wind,rain:pop,pop1:pop1,pop2:pop2,pop3:pop3,pop4:pop4,
+            cloud:cloud,cloud1:cloud1,cloud2:cloud2,cloud3:cloud3,cloud4:cloud4,
+            sunrise:Sunrise,sunset:Sunset,
+            d1max_temp:d1max_temp,d1min_temp:d1min_temp,d2max_temp:d2max_temp,d2min_temp:d2min_temp,
+            d3max_temp:d3max_temp,d3min_temp:d3min_temp,d4max_temp:d4max_temp,d4min_temp:d4min_temp,
+            day1:day1,day2:day2,day3:day3,day4:day4});
+            
         })
+        .catch(error=>{
+            setCity('');
+            setCities('');
+            Alert.alert('OOPS!','We dont have weather for this location',[
+                {text:'OK',onPress:()=> console.log('error')}
+            ])
+        })   
         
-        
-
-        
-        
+    })
+    .catch(error=>{
+        setCity('');
+        setCities('');
+        Alert.alert('OOPS!','We dont have weather for this location',[
+            {text:'OK',onPress:()=> console.log('error')}
+        ])
     })
 }
 
 
     
     return(
-
-            <View style={{marginTop:'8%',alignItems:'center'}}>
+      <View style={{backgroundColor:'white',flex:1}}>
+                    <View style={{marginTop:'8%',alignItems:'center'}}>
                 <StatusBar barStyle='light-content'/>
             <TextInput
                 style={styles.input}
@@ -183,16 +288,23 @@ export default function Search({navigation}){
             }}
             keyExtractor={item=>item}
         />
-            <View style={styles.button}>
-            <Button 
-            title='Use my Location'
-            onPress={() => clickHandler()}/>
+        <TouchableOpacity onPress={() => clickHandler()}>
+        <View style={styles.button}>
+          <Text style={styles.text}>Use my Location</Text>
+
             </View>
+
+        </TouchableOpacity>
+            
         
             
                 
             
         </View>
+
+      </View>
+
+
         
 
     );
@@ -209,10 +321,22 @@ const styles = StyleSheet.create({
         borderWidth:1,
         borderColor:'#777',
         width:300,
+        color:'black',
+        backgroundColor:'white',
+        textShadowColor:'black'
     },
     button:{
         marginTop:'5%',
         marginBottom:'20%',
-        width:200,
+        borderRadius:8,
+        backgroundColor:'deepskyblue',
+        paddingVertical:12,
+        paddingHorizontal:16
+    },
+    text:{
+      color:'white',
+      fontWeight:'bold',
+      fontSize:16,
+      textTransform:'uppercase'
     }
 });

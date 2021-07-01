@@ -7,14 +7,13 @@ import axios from 'axios';
 
 export default function Day({navigation}){
 
-  //console.log(navigation.getParam('city'));
-  //const length =navigation.getParam('city').split(',').length;
   
   const city = navigation.getParam('city');
   const state = navigation.getParam('country');
   const temp = navigation.getParam('temprature');
   const time = navigation.getParam('Time');
   var timeperiod='';
+  var bgimg;
   const period = parseInt(time.split(':')[0]);
   if(period<12){
     timeperiod = 'AM';
@@ -23,68 +22,114 @@ export default function Day({navigation}){
     timeperiod = 'PM';
 
   }
+  if(period<5 || period>19){
+    bgimg=require('../assets/nighttime.png');
+
+  }
+  else{
+    bgimg=require('../assets/daytime.png');
+  }
   const maxtemp = navigation.getParam('max');
   const mintemp = navigation.getParam('min');
-  const wind = navigation.getParam('windspd');
+  var wind = navigation.getParam('windspd');
+  var windspd=parseFloat(wind);
+  windspd = Math.round(windspd * 100) / 100;
+  wind= windspd.toString();
   const rain = navigation.getParam('rain');
   const sunrise = navigation.getParam('sunrise');
   const sunset = navigation.getParam('sunset');
+  const d1max_temp = navigation.getParam('d1max_temp');
+  const d1min_temp = navigation.getParam('d1min_temp');
+  const d2max_temp = navigation.getParam('d2max_temp');
+  const d2min_temp = navigation.getParam('d2min_temp');
+  const d3max_temp = navigation.getParam('d3max_temp');
+  const d3min_temp = navigation.getParam('d3min_temp');
+  const d4max_temp = navigation.getParam('d4max_temp');
+  const d4min_temp = navigation.getParam('d4min_temp');
+  const day1 = navigation.getParam('day1');
+  const day2 = navigation.getParam('day2');
+  const day3 = navigation.getParam('day3');
+  const day4 = navigation.getParam('day4');
+  const pop1 = parseInt(navigation.getParam('pop1'));
+  const pop2 = parseInt(navigation.getParam('pop2'));
+  const pop3 = parseInt(navigation.getParam('pop3'));
+  const pop4 = parseInt(navigation.getParam('pop4'));
+  const cloud = parseInt(navigation.getParam('cloud'));
+  const cloud1 = parseInt(navigation.getParam('cloud1'));
+  const cloud2 = parseInt(navigation.getParam('cloud2'));
+  const cloud3 = parseInt(navigation.getParam('cloud3'));
+  const cloud4 = parseInt(navigation.getParam('cloud4'));
+
+  if(rain>=30){
+    var report = 'Showers';
+    var d1img=require("../assets/rainy.png");
+  }
+  else if(cloud>30){
+    var report = 'Cloudy';
+    var d1img=require("../assets/cloud.png");
+  }
+  else{
+    var report = 'Sunny';
+    var d1img=require("../assets/cloudy-sun.png");
+
+  }
 
 
-   const [desc, setdesc] = useState({
-    temp:'Loading',
-    time:'Loading',
-    max_temp:'Loading',
-    min_temp:'Loading',
-    wind:'Loading',
-    Sunrise:'Loading',
-    Sunset:'Loading',
-    pop:'Loading'
-  })
+  if(pop1>=30){
+    var report1 = 'Showers';
+    var d2img=require("../assets/rainy.png");
+  }
+  else if(cloud1>30){
+    var report1 = 'Cloudy';
+    var d2img=require("../assets/cloud.png");
+  }
+  else{
+    var report1 = 'Sunny';
+    var d2img=require("../assets/cloudy-sun.png");
+  }
 
-  
-  global.check='initial';
+  if(pop2>=30){
+    var report2 = 'Showers';
+    var d3img=require("../assets/rainy.png");
+  }
+  else if(cloud2>30){
+    var report2 = 'Cloudy';
+    var d3img=require("../assets/cloud.png");
+  }
+  else{
+    var report2 = 'Sunny';
+    var d3img=require("../assets/cloudy-sun.png");
 
- /* useEffect(()=>{
-    caller();
+  }
 
-  },[])
-const caller =()=>{
-  axios.get("https://api.weatherbit.io/v2.0/forecast/daily?city="+city+","+state+"&key=c8a42097ee0148de82b6fe4c5e85b6b5")
-  .then(info =>{
-    global.check = info.data.timezone;
+  if(pop3>=30){
+    var report3 = 'Showers';
+    var d4img=require("../assets/rainy.png");
+  }
+  else if(cloud3>30){
+    var report3 = 'Cloudy';
+    var d4img=require("../assets/cloud.png");
+  }
+  else{
+    var report3 = 'Sunny';
+    var d4img=require("../assets/cloudy-sun.png");
 
-    //console.log(info.data.data[0]);
-    axios.get("http://worldtimeapi.org/api/timezone/"+check+".json")
-    .then(time=>{
-      const dateobj1 = new Date(info.data.data[0].sunrise_ts*1000);
-      const dateobj2 = new Date(info.data.data[0].sunset_ts*1000)
-      const sr =dateobj1.toLocaleString().slice(11,16);
-      const ss =dateobj2.toLocaleString().slice(11,16);
-      
+  }
 
-      setdesc({
-        temp:info.data.data[0].temp,
-        time:time.data.datetime.slice(11,16),
-        max_temp:info.data.data[0].max_temp,
-        min_temp:info.data.data[0].min_temp,
-        wind:info.data.data[0].wind_spd,
-        pop:info.data.data[0].pop,
-        Sunrise:sr,
-        Sunset:ss
-      })
-      //console.log(time);
-    })
-    .catch(error=>{
-      console.log(check);
-      console.log('hardik');
-    })
-    
-      //console.log(info.data.timezone)
-  })
+  if(pop4>=30){
+    var report4 = 'Showers';
+    var d5img=require("../assets/rainy.png");
+  }
+  else if(cloud4>30){
+    var report4 = 'Cloudy';
+    var d5img=require("../assets/cloud.png");
+  }
+  else{
+    var report4 = 'Sunny';
+    var d5img=require("../assets/cloudy-sun.png");
 
+  }
 
-}*/
 
 
 
@@ -98,48 +143,48 @@ const caller =()=>{
 
           <View style={{flex:1}}>
             <StatusBar barStyle='light-content'/>
-          <ImageBackground source={require('../assets/daytime.png')}
+          <ImageBackground source={bgimg}
         style={{width:windowWidth,height:windowHeight,alignItems:'center'}}>
           <ScrollView
           showsVerticalScrollIndicator={false}>
           <View style={{justifyContent:'center',alignItems:'center',marginBottom:50,marginTop:'60%',padding:10}}>
             <Text style={{color:'white',fontSize:30,fontWeight:'bold'}}>{temp}° C</Text>
-            <Text style={{color:'white',fontSize:22,marginTop:'3%'}}>{city} ,{state}</Text>
+            <Text style={{color:'white',fontSize:22,marginTop:'3%'}}>{city} , {state}</Text>
             <Text style={{color:'white',fontSize:15}}>{time} {timeperiod}</Text>
           </View>
           <ScrollView horizontal={true}
-          showsHorizontalScrollIndicator={false}>
+          showsHorizontalScrollIndicator={false}> 
             <View style={{flexDirection:'row'}}>
-              <View style={{flex:1}}>
-              <Image source={require("../assets/cloud.png")} style={styles.forcast_img}  />
+              <View style={{width:130}}>
+              <Image source={d1img} style={styles.forcast_img}  />
               <Text style={styles.forcastdays}>Today</Text>
-              <Text style={styles.forcast_desc}>Cloudy</Text>
-              <Text style={styles.forcast_desc}>40° 26°</Text>
+              <Text style={styles.forcast_desc}>{report}</Text>
+              <Text style={styles.forcast_desc}>{maxtemp}°C  {mintemp}°C</Text>
 
               </View>
-              <View style={{width:120}}>
-              <Image source={require("../assets/cloudy-sun.png")} style={styles.forcast_img}  />
-              <Text style={styles.forcastdays}>Tues</Text>
-              <Text style={styles.forcast_desc}>Sunny</Text>
-              <Text style={styles.forcast_desc}>40° 26°</Text>
+              <View style={{width:130}}>
+              <Image source={d2img} style={styles.forcast_img}  />
+              <Text style={styles.forcastdays}>{day1}</Text>
+              <Text style={styles.forcast_desc}>{report1}</Text>
+              <Text style={styles.forcast_desc}>{d1max_temp}°C  {d1min_temp}°C</Text>
               </View>
-              <View style={{width:120}}>
-              <Image source={require("../assets/rainy.png")} style={styles.forcast_img}  />
-              <Text style={styles.forcastdays}>Wed</Text>
-              <Text style={styles.forcast_desc}>Showers</Text>
-              <Text style={styles.forcast_desc}>40° 26°</Text>
+              <View style={{width:130}}>
+              <Image source={d3img} style={styles.forcast_img}  />
+              <Text style={styles.forcastdays}>{day2}</Text>
+              <Text style={styles.forcast_desc}>{report2}</Text>
+              <Text style={styles.forcast_desc}>{d2max_temp}°C  {d2min_temp}°C</Text>
               </View>
-              <View style={{width:120}}>
-              <Image source={require("../assets/cloud.png")} style={styles.forcast_img}  />
-              <Text style={styles.forcastdays}>Thus</Text>
-              <Text style={styles.forcast_desc}>Cloudy</Text>
-              <Text style={styles.forcast_desc}>40° 26°</Text>
+              <View style={{width:130}}>
+              <Image source={d4img} style={styles.forcast_img}  />
+              <Text style={styles.forcastdays}>{day3}</Text>
+              <Text style={styles.forcast_desc}>{report3}</Text>
+              <Text style={styles.forcast_desc}>{d3max_temp}°C  {d3min_temp}°C</Text>
               </View>
-              <View style={{width:120}}>
-              <Image source={require("../assets/cloudy-sun.png")} style={styles.forcast_img}  />
-              <Text style={styles.forcastdays}>Fri</Text>
-              <Text style={styles.forcast_desc}>Sunny</Text>
-              <Text style={styles.forcast_desc}>40° 26°</Text>
+              <View style={{width:130}}>
+              <Image source={d5img} style={styles.forcast_img}  />
+              <Text style={styles.forcastdays}>{day4}</Text>
+              <Text style={styles.forcast_desc}>{report4}</Text>
+              <Text style={styles.forcast_desc}>{d4max_temp}°C  {d4min_temp}°C</Text>
               </View>
             
             
@@ -208,7 +253,9 @@ const styles = StyleSheet.create({
     fontSize:18,
     color:'white',
     textAlign:'center',
-    fontWeight:'bold'
+    fontWeight:'bold',
+    marginRight:'5%',
+    marginLeft:'5%'
 
   },
   description:{
@@ -222,14 +269,16 @@ const styles = StyleSheet.create({
   forcast_img:{
     width:80,
     height:80,
-    marginRight:20,
-    marginLeft:20
+    marginRight:30,
+    marginLeft:25
 
   },
   forcast_desc:{
     fontSize:16,
     color:'white',
     textAlign:'center',
+    marginLeft:'10%',
+    marginRight:'10%'
 
   }
 })

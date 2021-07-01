@@ -9,8 +9,6 @@ import Navigator from './routes/homeStack';
 
 export default function App() {
 
-  //console.disableYellowBox = true;
-  //LogBox.ignoreAllLogs(disable);
 
     return (
       <Navigator 
